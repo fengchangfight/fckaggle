@@ -7,6 +7,8 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
+from sklearn import svm
+
 print('Import Successful')
 
 # Importing Data
@@ -81,24 +83,38 @@ score = make_scorer(fbeta_score, beta=0.5)
 
 train_data.drop('PassengerId', axis=1, inplace=True)
 
+'''
 new_cls = RandomForestClassifier()
 new_parameters = {'max_features':[None],'max_depth': [18], 'n_estimators':[239], 'min_samples_leaf':[6], 'criterion': ['gini']}
 new_crossV = StratifiedKFold(y_true, n_folds=5)
 # new_score = make_scorer(fbeta_score, beta=1)
 new_gridSearch = GridSearchCV(estimator=new_cls, param_grid=new_parameters, cv= new_crossV)
 new_gridSearch.fit(train_data, y_true)
+'''
 
+clf = svm.SVC()
+clf.fit(train_data, y_true)
+
+'''
 print('Best score: {}'.format(new_gridSearch.best_score_))
 print('Best parameters: {}'.format(new_gridSearch.best_params_))
+'''
+
 
 test_PId =  test_data['PassengerId']
 test_data.drop('PassengerId',axis=1,inplace=True)
+
+y_pred = clf.predict(test_data)
+
+'''
 y_pred = new_gridSearch.predict(test_data)
+'''
+
 
 outputDf = pd.DataFrame()
 outputDf['PassengerId'] = test_PId
 outputDf['Survived'] = y_pred
 
 #Output it to output.csv
-outputDf.to_csv('../output/output.csv', index=False)
+outputDf.to_csv('../output/output_svm.csv', index=False)
 outputDf.head()
